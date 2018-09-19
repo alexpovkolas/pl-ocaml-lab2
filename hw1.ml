@@ -17,10 +17,10 @@ type bool_expr =
 
 exception UndefinedVariable of string
 
-type letlang_expr = 
+(* type letlang_expr = 
   Const of int
   | Var of string
-  | Let of string * letlang_expr * letlang_expr
+  | Let of string * letlang_expr * letlang_expr *)
 
 let rec is_positive list = 
   match list with
@@ -82,13 +82,36 @@ let search_book term books =
       [] -> acc
       | h::t -> aux t (if check_book term h then h::acc else acc) in
   aux books [];;
-   
-      
+         
+let rec simplify expr =
+  match expr with
+    Const c -> expr
+    | Var s -> expr
+    | Not e -> simplify e    
+    | And (Const(True), e) -> simplify e
+    | And (e, Const(True)) -> simplify e
+    | And (Const(False), e) -> Const(False)
+    | And (e, Const(False)) -> Const(False)          
+    | And (e1, e2) -> And(simplify e1, simplify e2) 
+    | Or (Const(True), e) -> Const(True)
+    | Or (e, Const(True)) -> Const(True)
+    | Or (Const(False), e) -> simplify e
+    | Or (e, Const(False)) -> simplify e
+    | Or (e1, e2) -> Or(simplify e1, simplify e2);;
 
 
 
 
-      
+
+
+
+
+assert(simplify(Const(True)) = Const(True));;
+assert(simplify(And(Const(True), Const(False))) = Const(False));;
+assert(simplify(And(Const(True), Var("any_var"))) = Var("any_var"));;
+assert(simplify(Not(And(Const(True), Var("any_var")))) = Var("any_var"));;
+assert(simplify(Not(Or(Const(True), Var("any_var")))) = Const(True));;
+
 let author = {fname = "Mark"; sname = "Twain"};;
 let book1 = {author = author; name = "The Adventures of Tom Sawyer"; year = 1876};;
 let book2 = {author = author; name = "Adventures of Huckleberry Finn "; year = 1884};;
