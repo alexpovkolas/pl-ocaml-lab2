@@ -105,7 +105,6 @@ let rec lookup v en =
 
 
 
-
 assert((lookup "x" []) = None);;
 assert((lookup "x" [("x", Const 15)]) = Some (Const 15));;
 assert((lookup "x" [("x", Const 15); ("x", Const 14)]) = Some (Const 15));;
