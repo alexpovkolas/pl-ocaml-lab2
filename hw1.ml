@@ -64,9 +64,41 @@ let preorder tree =
   in aux tree [];;
 
 
+let check_book term book =
+  let rec find list =
+    match list with
+    [] -> false
+    | h::t -> if h = term then true else find t in
+
+  let {author = a; name = n; year = y} = book in
+  let {fname = fn; sname = sn} = a in
+
+  find (fn::sn::(String.split_on_char ' ' n));;
+
+
+let search_book term books =
+  let rec aux books acc =
+    match books with
+      [] -> acc
+      | h::t -> aux t (if check_book term h then h::acc else acc) in
+  aux books [];;
+   
+      
 
 
 
+
+      
+let author = {fname = "Mark"; sname = "Twain"};;
+let book1 = {author = author; name = "The Adventures of Tom Sawyer"; year = 1876};;
+let book2 = {author = author; name = "Adventures of Huckleberry Finn "; year = 1884};;
+    
+let books = [book1; book2];;
+assert(search_book "hello" [] = []);;
+assert(check_book "Adventures" book2 = true);;    
+assert(List.length (search_book "Adventures" books) = 2);;
+assert(List.length (search_book "Finn" books) = 1);;    
+  
 let rec print_list list =
   match list with
     [] -> ()
@@ -74,7 +106,7 @@ let rec print_list list =
 
 let big_tree = Br(6, Br(2, Br(1, Lf, Lf), Br(4, Br(3, Lf, Lf), Br(5, Lf, Lf))), Br(7, Lf, Br(9, Br(8, Lf, Lf), Lf)));;
 
-print_list (preorder(big_tree));;
+(* print_list (preorder(big_tree));; *)
 
 assert(preorder big_tree = [6;2;1;4;3;5;7;9;8]);;
 
