@@ -17,10 +17,10 @@ type bool_expr =
 
 exception UndefinedVariable of string
 
-(* type letlang_expr = 
+type letlang_expr = 
   Const of int
   | Var of string
-  | Let of string * letlang_expr * letlang_expr *)
+  | Let of string * letlang_expr * letlang_expr
 
 let rec is_positive list = 
   match list with
@@ -48,33 +48,28 @@ let rec gen_tree n =
     0 -> Lf
     | k -> Br(k, Lf, gen_tree(k-1));;
 
-
 let inorder tree =
   let rec aux tree acc = 
     match tree with
       Lf -> acc
-      | Br (i, left, right) -> aux left (i::(aux right acc))
-  in aux tree [];;
+      | Br (i, left, right) -> aux left (i::(aux right acc)) in
+  aux tree [];;
 
 let preorder tree =
   let rec aux tree acc = 
     match tree with
       Lf -> acc
-      | Br (i, left, right) -> i::aux left (aux right acc)
-  in aux tree [];;
-
+      | Br (i, left, right) -> i::aux left (aux right acc) in
+  aux tree [];;
 
 let check_book term book =
   let rec find list =
     match list with
     [] -> false
     | h::t -> if h = term then true else find t in
-
   let {author = a; name = n; year = y} = book in
   let {fname = fn; sname = sn} = a in
-
   find (fn::sn::(String.split_on_char ' ' n));;
-
 
 let search_book term books =
   let rec aux books acc =
@@ -83,7 +78,8 @@ let search_book term books =
       | h::t -> aux t (if check_book term h then h::acc else acc) in
   aux books [];;
          
-let rec simplify expr =
+
+let rec simplify (expr: bool_expr) =
   match expr with
     Const c -> expr
     | Var s -> expr
@@ -99,11 +95,20 @@ let rec simplify expr =
     | Or (e, Const(False)) -> simplify e
     | Or (e1, e2) -> Or(simplify e1, simplify e2);;
 
+let rec lookup v en =
+  match en with 
+    [] -> None
+    | (name, expr)::t -> if name = v then Some expr else lookup v t;;
 
 
 
 
 
+
+
+assert((lookup "x" []) = None);;
+assert((lookup "x" [("x", Const 15)]) = Some (Const 15));;
+assert((lookup "x" [("x", Const 15); ("x", Const 14)]) = Some (Const 15));;
 
 
 assert(simplify(Const(True)) = Const(True));;
