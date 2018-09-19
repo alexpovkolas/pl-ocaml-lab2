@@ -49,6 +49,38 @@ let rec gen_tree n =
     | k -> Br(k, Lf, gen_tree(k-1));;
 
 
+let inorder tree =
+  let rec aux tree acc = 
+    match tree with
+      Lf -> acc
+      | Br (i, left, right) -> aux left (i::(aux right acc))
+  in aux tree [];;
+
+let preorder tree =
+  let rec aux tree acc = 
+    match tree with
+      Lf -> acc
+      | Br (i, left, right) -> i::aux left (aux right acc)
+  in aux tree [];;
+
+
+
+
+
+let rec print_list list =
+  match list with
+    [] -> ()
+    | e::l -> print_int e; print_string " "; print_list l;;
+
+let big_tree = Br(6, Br(2, Br(1, Lf, Lf), Br(4, Br(3, Lf, Lf), Br(5, Lf, Lf))), Br(7, Lf, Br(9, Br(8, Lf, Lf), Lf)));;
+
+print_list (preorder(big_tree));;
+
+assert(preorder big_tree = [6;2;1;4;3;5;7;9;8]);;
+
+assert(inorder(Br(1, Lf, Lf)) = [1]);;
+assert(inorder big_tree = [1;2;3;4;5;6;7;8;9]);;
+
 assert(6 = count_branches (gen_tree 3));;
 assert(4 = depth (gen_tree 4));;
 
