@@ -81,18 +81,14 @@ let search_book term books =
 
 let rec simplify (expr: bool_expr) =
   match expr with
-    Const c -> expr
-    | Var s -> expr
+    Const _ -> expr
+    | Var _ -> expr
     | Not e -> simplify e    
-    | And (Const(True), e) -> simplify e
-    | And (e, Const(True)) -> simplify e
-    | And (Const(False), e) -> Const(False)
-    | And (e, Const(False)) -> Const(False)          
+    | And (Const(True), e) | And (e, Const(True)) -> simplify e
+    | And (Const(False), _) | And (_, Const(False)) -> Const(False)
     | And (e1, e2) -> And(simplify e1, simplify e2) 
-    | Or (Const(True), e) -> Const(True)
-    | Or (e, Const(True)) -> Const(True)
-    | Or (Const(False), e) -> simplify e
-    | Or (e, Const(False)) -> simplify e
+    | Or (Const(True), _) | Or (_, Const(True)) -> Const(True)
+    | Or (Const(False), e) | Or (e, Const(False)) -> simplify e
     | Or (e1, e2) -> Or(simplify e1, simplify e2);;
 
 let rec lookup v en =
@@ -100,6 +96,25 @@ let rec lookup v en =
     [] -> None
     | (name, expr)::t -> if name = v then Some expr else lookup v t;;
 
+(* type letlang_expr = 
+  Const of int
+  | Var of string
+  | Let of string * letlang_expr * letlang_expr *)
+
+
+let eval expr =
+  let rec eval_env ex env =
+    match ex with
+      Const _ -> ex
+      | Var v -> 
+        (match lookup v env with
+          None -> raise (UndefinedVariable v)
+          | Some e ->  eval_env e env)
+      | Let (l, ex1, ex2) -> 
+        let nexp = eval_env ex1 env in
+        let link = (l, nexp) in
+        eval_env ex2 (link::env) in
+  eval_env expr [];;
 
 
 
