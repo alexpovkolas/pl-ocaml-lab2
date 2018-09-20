@@ -25,7 +25,7 @@ type letlang_expr =
 let rec is_positive list = 
   match list with
     | [] -> true
-    | h::t -> if h < 0 then false else is_positive t;;
+    | h::t -> if h < 0 then false else is_positive t
 
 let rec is_sorted list = 
   match list with
@@ -78,7 +78,6 @@ let search_book term books =
       | h::t -> aux t (if check_book term h then h::acc else acc) in
   aux books [];;
          
-
 let rec simplify (expr: bool_expr) =
   match expr with
     Const _ -> expr
@@ -96,12 +95,6 @@ let rec lookup v en =
     [] -> None
     | (name, expr)::t -> if name = v then Some expr else lookup v t;;
 
-(* type letlang_expr = 
-  Const of int
-  | Var of string
-  | Let of string * letlang_expr * letlang_expr *)
-
-
 let eval expr =
   let rec eval_env ex env =
     match ex with
@@ -116,65 +109,3 @@ let eval expr =
         eval_env ex2 (link::env) in
   eval_env expr [];;
 
-
-
-
-
-assert((lookup "x" []) = None);;
-assert((lookup "x" [("x", Const 15)]) = Some (Const 15));;
-assert((lookup "x" [("x", Const 15); ("x", Const 14)]) = Some (Const 15));;
-
-
-assert(simplify(Const(True)) = Const(True));;
-assert(simplify(And(Const(True), Const(False))) = Const(False));;
-assert(simplify(And(Const(True), Var("any_var"))) = Var("any_var"));;
-assert(simplify(Not(And(Const(True), Var("any_var")))) = Var("any_var"));;
-assert(simplify(Not(Or(Const(True), Var("any_var")))) = Const(True));;
-
-let author = {fname = "Mark"; sname = "Twain"};;
-let book1 = {author = author; name = "The Adventures of Tom Sawyer"; year = 1876};;
-let book2 = {author = author; name = "Adventures of Huckleberry Finn "; year = 1884};;
-    
-let books = [book1; book2];;
-assert(search_book "hello" [] = []);;
-assert(check_book "Adventures" book2 = true);;    
-assert(List.length (search_book "Adventures" books) = 2);;
-assert(List.length (search_book "Finn" books) = 1);;    
-  
-let rec print_list list =
-  match list with
-    [] -> ()
-    | e::l -> print_int e; print_string " "; print_list l;;
-
-let big_tree = Br(6, Br(2, Br(1, Lf, Lf), Br(4, Br(3, Lf, Lf), Br(5, Lf, Lf))), Br(7, Lf, Br(9, Br(8, Lf, Lf), Lf)));;
-
-(* print_list (preorder(big_tree));; *)
-
-assert(preorder big_tree = [6;2;1;4;3;5;7;9;8]);;
-
-assert(inorder(Br(1, Lf, Lf)) = [1]);;
-assert(inorder big_tree = [1;2;3;4;5;6;7;8;9]);;
-
-assert(6 = count_branches (gen_tree 3));;
-assert(4 = depth (gen_tree 4));;
-
-assert(gen_tree 0 = Lf);;
-assert(gen_tree 1 = Br(1, Lf, Lf));;
-assert(gen_tree 3 = Br(3, Lf, Br(2, Lf, Br(1, Lf, Lf))));;
-
-assert(depth Lf = 0);;
-assert(depth (Br(1, Lf, Lf)) = 1);;
-assert(depth (Br(1, Lf, Br(3, Br(4, Lf, Lf), Lf))) = 3);;
-
-assert(count_branches Lf = 0);;
-assert(count_branches (Br(1, Lf, Lf)) = 1);;
-assert(count_branches (Br(1, Lf, Br(3, Br(4, Lf, Lf), Lf))) = 8);;
-
-assert(is_positive [2] = true);;
-assert(is_positive [4] = true);;
-assert(is_positive [4; -1] = false);;
-
-assert(is_sorted [] = true);;
-assert(is_sorted [4] = true);;
-assert(is_sorted [4; -1] = false);;
-assert(is_sorted [3; 5; 5; 7] = true);;
